@@ -5,30 +5,24 @@ import { FaTelegramPlane } from "react-icons/fa";
 import BackgroundEffect from "@/components/BackgroundEffect";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-  const handleSignUp = async (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      const response = await fetch('/api/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        setError(data.error || 'Failed to send verification code');
-        return;
-      }
-      router.push(`/verify?email=${encodeURIComponent(email)}`);
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/auth");
     } catch (err) {
-      setError(err.message || 'Error sending verification code');
+      setError(err.message || "Failed to sign in");
     }
   };
 
@@ -50,7 +44,7 @@ export default function SignIn() {
             {message}
           </div>
         )}
-        <form onSubmit={handleSignUp} className="w-full flex flex-col gap-4">
+        <form onSubmit={handleSignIn} className="w-full flex flex-col gap-4">
           <div className="w-full">
             <label htmlFor="email" className="text-gray-200 font-semibold mb-0 text-base text-left">Email</label>
             <input
@@ -63,8 +57,20 @@ export default function SignIn() {
               required
             />
           </div>
+          <div className="w-full">
+            <label htmlFor="password" className="text-gray-200 font-semibold mb-0 text-base text-left">Password</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="********"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 rounded bg-black border border-gray-700 text-gray-200 focus:outline-none focus:border-yellow-400 placeholder-gray-500 italic text-base font-semibold"
+              required
+            />
+          </div>
           <button type="submit" className="w-full py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-extrabold rounded mt-2 text-lg shadow-md">
-            Continue
+            Sign In
           </button>
           <div className="flex items-center my-4 w-full">
             <div className="flex-1 h-px bg-gray-700" />
@@ -95,7 +101,7 @@ export default function SignIn() {
           <span className="text-blue-400 cursor-pointer mx-1">terms of service</span>
           and
           <span className="text-blue-400 cursor-pointer mx-1">privacy policy<span className="text-white">.</span></span>
-        </div>
+      </div>
       </section>
     </main>
   );

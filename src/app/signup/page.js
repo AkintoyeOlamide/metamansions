@@ -14,25 +14,19 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError("");
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
 
     try {
       // Create user in Firebase Auth and sign them in
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
       // Save user info in Firestore (do NOT save password)
       await setDoc(doc(db, "users", email), {
@@ -50,7 +44,9 @@ export default function SignUp() {
       });
 
       // Redirect to verification page
-      router.push(`/verify?email=${email}`);
+      setTimeout(() => {
+        router.push(`/verify?email=${email}`);
+      }, 700);
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
         setError("Email already in use");
@@ -60,6 +56,8 @@ export default function SignUp() {
         setError(err.message || "Error creating account");
       }
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -114,8 +112,22 @@ export default function SignUp() {
               {showConfirm ? <HiOutlineEyeOff /> : <HiOutlineEye />}
             </span>
           </div>
-          <button type="submit" className="w-full py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded mt-2">
-            Sign Up
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded mt-2 flex items-center justify-center"
+          >
+            {loading ? (
+              <>
+                <svg className="animate-spin h-5 w-5 mr-2 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+                Sending code...
+              </>
+            ) : (
+              'Sign Up'
+            )}
           </button>
         </form>
         <div className="w-full text-center mt-4 text-gray-400 text-sm">

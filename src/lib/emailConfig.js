@@ -1,11 +1,11 @@
 import nodemailer from 'nodemailer';
 
-// Create a transporter using Gmail SMTP with hardcoded credentials
+// Create a transporter using Gmail SMTP
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'sanitycodes@gmail.com',  // Hardcoded email
-    pass: 'tpfk eyle jfem aqgg'     // Hardcoded app password
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 
@@ -38,8 +38,13 @@ export const verifyOTP = (email, userOtp) => {
 };
 
 export const sendVerificationEmail = async (email, otp) => {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error('Email configuration missing. Please set EMAIL_USER and EMAIL_PASS environment variables.');
+    return false;
+  }
+
   const mailOptions = {
-    from: process.env.EMAIL_USER ?? 'sanitycodes@gmail.com',
+    from: process.env.EMAIL_USER,
     to: email,
     subject: 'Meta Mansions - Email Verification',
     html: `
@@ -58,24 +63,14 @@ export const sendVerificationEmail = async (email, otp) => {
   };
 
   try {
-    console.log('Attempting to send email with config:', {
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER ?? "sanitycodes@gmail.com",
-        // pass: process.env.EMAIL_PASS ? '****' : 'not set'
-        pass: process.env.EMAIL_PASS ?? "tpfk eyle jfem aqgg"
-      }
-    });
     const result = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', result);
+    console.log('Email sent successfully to:', email);
     return true;
   } catch (error) {
-    console.error('Detailed error sending email:', {
+    console.error('Error sending email:', {
       errorName: error.name,
       errorMessage: error.message,
-      errorCode: error.code,
-      errorCommand: error.command,
-      errorResponse: error.response
+      errorCode: error.code
     });
     return false;
   }

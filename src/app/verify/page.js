@@ -7,9 +7,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { db, auth } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { signInWithCustomToken } from 'firebase/auth';
-import DotsBackground from '@/components/DotsBackground';
 
 function VerifyContent() {
+  console.log('VerifyContent component rendering'); // Debug log
+
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -24,8 +25,12 @@ function VerifyContent() {
   ];
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [modalOpen, setModalOpen] = useState(false);
+  const helpBtnRef = useRef(null);
+  const [modalPos, setModalPos] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
+    console.log('VerifyContent useEffect running'); // Debug log
     const queryEmail = searchParams.get('email');
     if (!queryEmail) {
       router.push('/signup');
@@ -69,35 +74,43 @@ function VerifyContent() {
   };
 
   const handleSubmit = async (e) => {
+    console.log('Submit button clicked - immediate log'); // Immediate debug log
     e.preventDefault();
     setError('');
     setMessage('');
     const otpString = otp.join('');
+    
     if (otpString.length !== 6) {
       setError('Please enter all 6 digits');
       return;
     }
+
     try {
       const response = await fetch('/api/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp: otpString })
       });
+      
       const data = await response.json();
+      
       if (!response.ok) {
         setError(data.error || 'Verification failed');
         return;
       }
+      
       setMessage('Verification successful! Redirecting...');
       setTimeout(() => {
-        router.push(`/profile?email=${email}`);
+        router.push(`/profile?email=${encodeURIComponent(email)}`);
       }, 1500);
     } catch (err) {
-      setError(err.message || 'Verification failed');
+      console.error('Verification error:', err);
+      setError('An unexpected error occurred. Please try again.');
     }
   };
 
   const handleResendCode = async () => {
+    console.log('Resend code button clicked - immediate log'); // Immediate debug log
     setError('');
     setMessage('');
     
@@ -110,43 +123,114 @@ function VerifyContent() {
         body: JSON.stringify({ email })
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to resend code');
+        throw new Error(data.error || 'Failed to resend code');
       }
 
-      setMessage('New verification code sent!');
+      setMessage('New verification code sent! Please check your email.');
       setOtp(['', '', '', '', '', '']);
       inputRefs[0].current?.focus();
     } catch (err) {
-      setError(err.message || 'Failed to resend code');
-      console.error(err);
+      console.error('Resend code error:', err);
+      setError(err.message || 'Failed to resend code. Please try again.');
     }
+  };
+
+  const openModal = () => {
+    if (helpBtnRef.current) {
+      const rect = helpBtnRef.current.getBoundingClientRect();
+      setModalPos({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX
+      });
+    }
+    setModalOpen(true);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black relative">
-      <DotsBackground />
-      <div className="w-full max-w-sm mx-auto bg-black border border-yellow-600 rounded-xl p-8 flex flex-col items-center shadow-lg relative z-10">
-        <Image src="/gold-logo.PNG" alt="Gold Logo" width={40} height={40} className="mb-6" />
-        <h2 className="text-xl font-bold text-yellow-400 mb-2">Verify Your Account</h2>
-        <p className="text-gray-400 text-sm text-center mb-8">
-          We've sent a verification code to {email}
+      <div className="absolute top-8 left-0 w-full flex justify-center z-20">
+        <Image src="/gold-logo.PNG" alt="Gold Logo" width={40} height={40} />
+      </div>
+      <div className="flex flex-col items-center w-full px-4">
+        <div className="flex items-center w-full max-w-3xl mb-2" style={{ position: 'relative' }}>
+          <h2 className="text-3xl font-extrabold text-white text-left flex-1">Verify your email</h2>
+          <button
+            ref={helpBtnRef}
+            aria-label="Help"
+            onClick={openModal}
+            className="ml-2 p-1 rounded-full border border-white text-xs font-bold focus:outline-none flex items-center justify-center shadow bg-transparent"
+            style={{ width: 24, height: 24 }}
+          >
+            <span style={{ color: '#fff', fontWeight: 'bold', fontSize: '14px', lineHeight: 1 }}>?</span>
+          </button>
+          {/* Modal */}
+          {modalOpen && (
+            <div
+              className="z-50"
+              style={{
+                position: 'absolute',
+                top: helpBtnRef.current ? helpBtnRef.current.offsetTop + helpBtnRef.current.offsetHeight : 0,
+                left: helpBtnRef.current ? helpBtnRef.current.offsetLeft : 0,
+                minWidth: '180px',
+              }}
+            >
+              <div className="bg-black rounded-lg p-3 relative text-white" style={{ border: '0.5px solid #fff' }}>
+                <button
+                  className="absolute top-2 right-2 text-white text-xl font-bold focus:outline-none"
+                  onClick={() => setModalOpen(false)}
+                  aria-label="Close"
+                  style={{ background: 'transparent', border: 'none' }}
+                >
+                  ×
+                </button>
+                <div className="flex flex-col gap-2 mt-2">
+                  <button
+                    className="w-full py-2 text-white bg-transparent hover:bg-white/10 rounded text-left"
+                    onClick={() => { handleResendCode(); setModalOpen(false); }}
+                  >
+                    Resend code
+                  </button>
+                  <button
+                    className="w-full py-2 text-white bg-transparent hover:bg-white/10 rounded text-left"
+                    onClick={() => { setModalOpen(false); router.push('/signup'); }}
+                  >
+                    Change email
+                  </button>
+                  <button
+                    className="w-full py-2 text-white bg-transparent hover:bg-white/10 rounded text-left"
+                    onClick={() => { setModalOpen(false); window.open('mailto:support@yourdomain.com'); }}
+                  >
+                    Contact Support
+                  </button>
+                  <button
+                    className="w-full py-2 text-white bg-transparent hover:bg-white/10 rounded text-left"
+                    onClick={() => { setModalOpen(false); router.push('/'); }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        <p className="text-gray-400 text-sm text-left mb-8 w-full max-w-3xl">
+          Keys Metaverse is a password-less platform. You will use this email to login into your account. Please check <span className="font-bold text-white">{email}</span> for your six digit code. Make sure to check spam😉
         </p>
-        
         {error && (
-          <div className="w-full p-3 mb-4 text-sm text-red-500 bg-red-500/10 rounded-lg">
+          <div className="w-full max-w-3xl p-3 mb-4 text-sm text-red-500 bg-red-500/10 rounded-lg">
             {error}
           </div>
         )}
-
         {message && (
-          <div className="w-full p-3 mb-4 text-sm text-green-500 bg-green-500/10 rounded-lg">
+          <div className="w-full max-w-3xl p-3 mb-4 text-sm text-green-500 bg-green-500/10 rounded-lg">
             {message}
           </div>
         )}
-
-        <form onSubmit={handleSubmit} className="w-full">
-          <div className="flex gap-2 justify-between mb-6">
+        <form onSubmit={handleSubmit} className="w-full max-w-3xl">
+          <div className="flex gap-1 justify-center mb-6">
             {otp.map((digit, index) => (
               <input
                 key={index}
@@ -161,27 +245,21 @@ function VerifyContent() {
               />
             ))}
           </div>
-
           <button
             type="submit"
-            className="w-full py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded transition-colors"
+            className="w-64 mx-auto py-2 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded transition-colors"
+            style={{ display: 'block' }}
           >
             Verify Account
           </button>
         </form>
-
-        <button
-          onClick={handleResendCode}
-          className="mt-4 text-gray-400 hover:text-yellow-400 text-sm"
-        >
-          Resend Code
-        </button>
       </div>
     </div>
   );
 }
 
 export default function Verify() {
+  console.log('Verify component rendering'); // Debug log
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <VerifyContent />

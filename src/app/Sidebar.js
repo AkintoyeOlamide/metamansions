@@ -70,7 +70,7 @@ export default function Sidebar() {
         {/* Logo */}
         <div className="pt-4">
           <Link href="/" className="block hover:opacity-80 transition-opacity">
-            <Image src="/gold-logo.PNG" alt="Gold Logo" width={40} height={40} />
+          <Image src="/gold-logo.PNG" alt="Gold Logo" width={40} height={40} />
           </Link>
         </div>
         {/* Spacer above main icons */}

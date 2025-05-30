@@ -7,15 +7,19 @@ import { FiMail, FiLock } from "react-icons/fi";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import BackgroundEffect from "@/components/BackgroundEffect";
 import { useState, useEffect } from "react";
-import { signInWithEmailAndPassword, sendSignInLinkToEmail } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendSignInLinkToEmail } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { SiMetamask } from 'react-icons/si';
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function Home() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const actionCodeSettings = {
@@ -25,21 +29,48 @@ export default function Home() {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setError("");
+
     try {
+      // Create user with email and password
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Save user info in Firestore (do NOT save password)
+      await setDoc(doc(db, "users", email), {
+        email,
+        otpVerified: false,
+        otp: Math.floor(100000 + Math.random() * 900000).toString(),
+        otpCreatedAt: Date.now(),
+      });
+
+      // Send OTP via API
       const response = await fetch('/api/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
+
       if (!response.ok) {
         const data = await response.json();
         setError(data.error || 'Failed to send verification code');
         return;
       }
+
+      // Redirect to OTP verification page
       router.push(`/verify?email=${encodeURIComponent(email)}`);
     } catch (err) {
-      setError(err.message || 'Error sending verification code');
+      if (err.code === "auth/email-already-in-use") {
+        setError("Email already in use");
+      } else if (err.code === "auth/invalid-email") {
+        setError("Invalid email address");
+      } else {
+        setError(err.message || "Error creating account");
+      }
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,6 +123,18 @@ export default function Home() {
                 placeholder="johnappleseed@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3 py-2 rounded bg-black border border-gray-700 text-gray-200 focus:outline-none focus:border-yellow-400 placeholder-gray-500 italic text-sm"
+                required
+              />
+            </div>
+            <div className="w-full">
+              <label htmlFor="password" className="text-gray-200 font-semibold mb-0 text-xs text-left">Password</label>
+              <input
+                type="password"
+                id="password"
+                placeholder="********"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-2 rounded bg-black border border-gray-700 text-gray-200 focus:outline-none focus:border-yellow-400 placeholder-gray-500 italic text-sm"
                 required
               />

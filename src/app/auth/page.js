@@ -1,11 +1,29 @@
 "use client";
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function AuthDashboard() {
   const [tab, setTab] = useState('CHAT');
   const [walletAddress, setWalletAddress] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        // If not authenticated, redirect to visitors landing page after a short delay
+        const timer = setTimeout(() => {
+          router.push('/');
+        }, 2000); // 2 seconds delay
+        return () => clearTimeout(timer);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
 
   const connectWallet = async () => {
     if (typeof window === "undefined" || !window.ethereum) {

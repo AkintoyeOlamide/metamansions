@@ -5,33 +5,52 @@ import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  FaHome, 
-  FaUser, 
-  FaCubes, 
-  FaShoppingCart, 
-  FaGamepad, 
-  FaUserTie, 
-  FaUsers, 
-  FaWallet, 
-  FaCog,
-  FaSignOutAlt 
+import {
+  FaRegBell,        // Notifications (outline)
+  FaRegCommentDots, // Messages (outline)
+  FaTicketAlt,      // Affiliates (filled, no outline)
+  FaRegUserCircle,  // Profile (outline)
+  FaHammer,         // Build a Meta Mansion (hammer)
 } from 'react-icons/fa';
+import {
+  FiHome,     // Home (outline)
+  FiSearch,   // Search (outline)
+  FiCompass,  // Discover (outline)
+  FiLogOut,   // Sign out (outline)
+  FiMenu      // Menu (outline)
+} from 'react-icons/fi';
+import { useEffect, useState } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
-const NAV_ITEMS = [
-  { label: 'Home', icon: FaHome, href: '/auth', color: 'bg-gray-700 text-white' },
-  { label: 'Profile', icon: FaUser, href: '/auth/profile', color: 'bg-gray-700 text-white' },
-  { label: 'Build', icon: FaCubes, href: '/auth/build', color: 'bg-gray-700 text-white' },
-  { label: 'Shop', icon: FaShoppingCart, href: '/auth/shop', color: 'bg-gray-700 text-white' },
-  { label: 'Play', icon: FaGamepad, href: '/auth/play', color: 'bg-gray-700 text-white' },
-  { label: 'Agent', icon: FaUserTie, href: '/auth/agent', color: 'bg-gray-700 text-white' },
-  { label: 'Friends', icon: FaUsers, href: '/auth/friends', color: 'bg-gray-700 text-white' },
-  { label: 'Wallet', icon: FaWallet, href: '/auth/wallet', color: 'bg-gray-700 text-white' },
-  { label: 'Settings', icon: FaCog, href: '/auth/settings', color: 'bg-gray-700 text-white' },
+const NAV_ITEMS_BASE = [
+  { label: 'Home', icon: FiHome, href: '/auth', color: '' },
+  { label: 'Search', icon: FiSearch, href: '/auth/search', color: '' },
+  { label: 'Discover', icon: FiCompass, href: '/auth/discover', color: '' },
+  { label: 'Messages', icon: FaRegCommentDots, href: '/auth/messages', color: '' },
+  { label: 'Notifications', icon: FaRegBell, href: '/auth/notifications', color: '' },
+  { label: 'Build a Meta Mansion', icon: FaHammer, href: '/auth/build', color: '' },
+  { label: 'Affiliates', icon: FaTicketAlt, href: '/auth/affiliates', color: '' },
 ];
 
 export default function AuthSidebar() {
   const router = useRouter();
+  const [profilePic, setProfilePic] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email.toLowerCase();
+        const userDoc = await getDoc(doc(db, 'users', email));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          if (data.profilePicture) setProfilePic(data.profilePicture);
+        }
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -41,6 +60,11 @@ export default function AuthSidebar() {
       console.error('Error signing out:', error);
     }
   };
+
+  const NAV_ITEMS = [
+    ...NAV_ITEMS_BASE,
+    { label: 'Profile', icon: null, href: '/auth/profile', color: '' },
+  ];
 
   return (
     <div className="fixed left-0 top-0 h-screen w-32 bg-black border-r border-yellow-600/20 flex flex-col">
@@ -56,40 +80,48 @@ export default function AuthSidebar() {
           />
         </Link>
       </div>
-
+      <div className="flex-1" />
       {/* Navigation Items */}
-      <nav className="flex-1 py-4">
+      <nav className="py-4">
         <ul className="space-y-4">
           {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
             return (
               <li key={item.label} className="flex justify-center">
                 <a
                   href={item.href}
-                  className="flex flex-col items-center group"
+                  className="flex flex-col items-center group relative"
                 >
-                  <span className={`w-7 h-7 flex items-center justify-center rounded-full ${item.color} mb-1 group-hover:opacity-80 transition-opacity`}>
-                    <Icon className="text-xs" />
+                  <span className={`w-7 h-7 flex items-center justify-center rounded-full mb-1 group-hover:opacity-80 transition-opacity`}>
+                    {item.label === 'Profile' ? (
+                      profilePic ? (
+                        <img src={profilePic} alt="Profile" width={28} height={28} className="rounded-full object-cover" />
+                      ) : (
+                        <FaRegUserCircle className="text-xl" />
+                      )
+                    ) : (
+                      item.icon && <item.icon className="text-xl" />
+                    )}
                   </span>
-                  <span className="font-medium text-[10px] text-gray-400 group-hover:text-white transition-colors">{item.label}</span>
+                  <span className="absolute left-full ml-4 top-1/2 -translate-y-1/2 z-50 px-4 py-2 min-w-[100px] rounded-lg bg-[rgba(23,23,23,0.95)] border border-white/10 text-yellow-400 text-sm font-medium opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 shadow-lg backdrop-blur-md">
+                    {item.label}
+                  </span>
                 </a>
               </li>
             );
           })}
         </ul>
       </nav>
-
-      {/* Sign Out Button */}
-      <div className="p-6 mt-auto">
-        <button
-          onClick={handleSignOut}
-          className="flex flex-col items-center w-full group"
-        >
-          <span className="w-7 h-7 flex items-center justify-center rounded-full bg-red-500 text-white mb-1 group-hover:opacity-80 transition-opacity">
-            <FaSignOutAlt className="text-xs" />
-          </span>
-          <span className="font-medium text-[10px] text-gray-400 group-hover:text-white transition-colors">Sign Out</span>
-        </button>
+      <div className="flex-1" />
+      {/* Hamburger Menu at the bottom - horizontal and stylish */}
+      <div className="flex flex-row items-center justify-center mb-6 mt-2 gap-2">
+        <span className="flex items-center justify-center">
+          {/* Stylish hamburger: two uneven lines */}
+          <svg width="22" height="18" viewBox="0 0 22 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect y="2" width="22" height="1.5" rx="0.75" fill="white" />
+            <rect x="0" y="11" width="14" height="1.5" rx="0.75" fill="white" />
+          </svg>
+        </span>
+        <span className="font-normal text-xs text-gray-400 tracking-wide">Menu</span>
       </div>
     </div>
   );
