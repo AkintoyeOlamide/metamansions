@@ -63,7 +63,7 @@ function UserExperienceContent() {
 
   const handleContinue = () => {
     if (joinedIdx !== null) {
-      router.push('/auth');
+      router.push('/auth/onboarding');
     }
   };
 
@@ -148,7 +148,7 @@ function UserExperienceContent() {
           </div>
         ))}
         <button
-          className="w-full mt-8 py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-lg text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full py-2 rounded bg-[#FFD700] hover:bg-yellow-400 text-black font-semibold text-base transition"
           disabled={joinedIdx === null}
           onClick={handleContinue}
         >

@@ -21,7 +21,7 @@ export default function AuthLayout({ children }) {
   return (
     <div className="min-h-screen bg-black">
       <AuthSidebar />
-      <main className="ml-32 p-8">
+      <main className="ml-23">
         {children}
       </main>
     </div>

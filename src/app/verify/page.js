@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { db, auth } from '@/lib/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { signInWithCustomToken } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 function VerifyContent() {
   console.log('VerifyContent component rendering'); // Debug log
@@ -98,11 +98,18 @@ function VerifyContent() {
         setError(data.error || 'Verification failed');
         return;
       }
-      
-      setMessage('Verification successful! Redirecting...');
-      setTimeout(() => {
-        router.push(`/profile?email=${encodeURIComponent(email)}`);
-      }, 1500);
+
+      // Sign in with Firebase after successful verification
+      try {
+        await signInWithEmailAndPassword(auth, email, data.temporaryPassword);
+        setMessage('Verification successful! Redirecting...');
+        setTimeout(() => {
+          router.push(data.redirectTo);
+        }, 1500);
+      } catch (authError) {
+        console.error('Firebase auth error:', authError);
+        setError('Authentication failed. Please try again.');
+      }
     } catch (err) {
       console.error('Verification error:', err);
       setError('An unexpected error occurred. Please try again.');

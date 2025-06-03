@@ -34,8 +34,8 @@ export default function Home() {
 
     try {
       // Create user with email and password
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      // const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // const user = userCredential.user;
 
       // Save user info in Firestore (do NOT save password)
       await setDoc(doc(db, "users", email), {

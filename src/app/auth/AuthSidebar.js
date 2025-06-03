@@ -16,6 +16,7 @@ import {
   FiHome,     // Home (outline)
   FiSearch,   // Search (outline)
   FiCompass,  // Discover (outline)
+  FiFlag,     // Onboarding (flag icon)
   FiLogOut,   // Sign out (outline)
   FiMenu      // Menu (outline)
 } from 'react-icons/fi';
@@ -28,6 +29,7 @@ const NAV_ITEMS_BASE = [
   { label: 'Home', icon: FiHome, href: '/auth', color: '' },
   { label: 'Search', icon: FiSearch, href: '/auth/search', color: '' },
   { label: 'Discover', icon: FiCompass, href: '/auth/discover', color: '' },
+  { label: 'Onboarding', icon: FiFlag, href: '/auth/onboarding', color: '' },
   { label: 'Messages', icon: FaRegCommentDots, href: '/auth/messages', color: '' },
   { label: 'Notifications', icon: FaRegBell, href: '/auth/notifications', color: '' },
   { label: 'Build a Meta Mansion', icon: FaHammer, href: '/auth/build', color: '' },
@@ -67,7 +69,7 @@ export default function AuthSidebar() {
   ];
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-32 bg-black border-r border-yellow-600/20 flex flex-col">
+    <div className="fixed left-0 top-0 h-screen w-20 bg-black border-r border-yellow-600/20 flex flex-col">
       {/* Logo Section */}
       <div className="p-4 flex justify-center">
         <Link href="/" className="relative w-10 h-10 hover:opacity-80 transition-opacity">
@@ -80,9 +82,8 @@ export default function AuthSidebar() {
           />
         </Link>
       </div>
-      <div className="flex-1" />
       {/* Navigation Items */}
-      <nav className="py-4">
+      <nav className="py-4 pt-16">
         <ul className="space-y-4">
           {NAV_ITEMS.map((item) => {
             return (
@@ -111,18 +112,6 @@ export default function AuthSidebar() {
           })}
         </ul>
       </nav>
-      <div className="flex-1" />
-      {/* Hamburger Menu at the bottom - horizontal and stylish */}
-      <div className="flex flex-row items-center justify-center mb-6 mt-2 gap-2">
-        <span className="flex items-center justify-center">
-          {/* Stylish hamburger: two uneven lines */}
-          <svg width="22" height="18" viewBox="0 0 22 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect y="2" width="22" height="1.5" rx="0.75" fill="white" />
-            <rect x="0" y="11" width="14" height="1.5" rx="0.75" fill="white" />
-          </svg>
-        </span>
-        <span className="font-normal text-xs text-gray-400 tracking-wide">Menu</span>
-      </div>
     </div>
   );
 } 

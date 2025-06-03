@@ -4,8 +4,8 @@ import nodemailer from 'nodemailer';
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: 'sanitycodes@gmail.com',
+    pass: 'tpfk eyle jfem aqgg'
   }
 });
 
@@ -38,13 +38,13 @@ export const verifyOTP = (email, userOtp) => {
 };
 
 export const sendVerificationEmail = async (email, otp) => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error('Email configuration missing. Please set EMAIL_USER and EMAIL_PASS environment variables.');
-    return false;
-  }
+  // if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+  //   console.error('Email configuration missing. Please set EMAIL_USER and EMAIL_PASS environment variables.');
+  //   return false;
+  // }
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: 'sanitycodes@gmail.com',
     to: email,
     subject: 'Meta Mansions - Email Verification',
     html: `

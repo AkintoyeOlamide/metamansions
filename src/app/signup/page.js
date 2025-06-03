@@ -23,35 +23,44 @@ export default function SignUp() {
     setLoading(true);
     setError("");
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
     try {
-      // Create user in Firebase Auth and sign them in
+      // Create user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Save user info in Firestore (do NOT save password)
-      await setDoc(doc(db, "users", email), {
-        email,
+      // Save user info in Firestore
+      await setDoc(doc(db, "users", email.toLowerCase()), {
+        email: email.toLowerCase(),
         otpVerified: false,
         otp: Math.floor(100000 + Math.random() * 900000).toString(),
         otpCreatedAt: Date.now(),
       });
 
-      // Send verification email (if you have this logic)
+      // Send verification email
       await fetch('/api/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       });
 
+      // Sign out the user until they verify their email
+      await auth.signOut();
+
       // Redirect to verification page
-      setTimeout(() => {
-        router.push(`/verify?email=${email}`);
-      }, 700);
+      router.push(`/verify?email=${encodeURIComponent(email)}`);
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
         setError("Email already in use");
       } else if (err.code === "auth/invalid-email") {
         setError("Invalid email address");
+      } else if (err.code === "auth/weak-password") {
+        setError("Password should be at least 6 characters");
       } else {
         setError(err.message || "Error creating account");
       }

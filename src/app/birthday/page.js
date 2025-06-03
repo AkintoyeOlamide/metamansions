@@ -114,7 +114,7 @@ function BirthdayContent() {
             </div>
           )}
         </div>
-        <p className="text-gray-400 text-base text-left mb-8">In order to give you the best experience on Keys Metaverse, please enter your birthday.</p>
+        <p className="text-gray-400 text-base text-left mb-8">In order to give you the best experience in Keys Metaverse, please enter your birthday.</p>
         {success && (
           <div className="w-full p-3 mb-4 text-sm text-green-500 bg-green-500/10 rounded-lg text-center">
             {success}
