@@ -1,12 +1,12 @@
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 
 // Create a transporter using Gmail SMTP
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-    user: 'sanitycodes@gmail.com',
-    pass: 'tpfk eyle jfem aqgg'
-  }
+    user: "sanitycodes@gmail.com",
+    pass: "tpfk eyle jfem aqgg",
+  },
 });
 
 // Store OTPs temporarily (in production, use a proper database)
@@ -15,7 +15,7 @@ const otpStore = new Map();
 export const storeOTP = (email, otp) => {
   otpStore.set(email, {
     otp,
-    createdAt: Date.now()
+    createdAt: Date.now(),
   });
 };
 
@@ -44,9 +44,9 @@ export const sendVerificationEmail = async (email, otp) => {
   // }
 
   const mailOptions = {
-    from: 'sanitycodes@gmail.com',
+    from: "sanitycodes@gmail.com",
     to: email,
-    subject: 'Meta Mansions - Email Verification',
+    subject: "Meta Mansions - Email Verification",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #000; text-align: center;">Welcome to Meta Mansions</h2>
@@ -59,19 +59,19 @@ export const sendVerificationEmail = async (email, otp) => {
           If you didn't request this code, please ignore this email.
         </p>
       </div>
-    `
+    `,
   };
 
   try {
     const result = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully to:', email);
+    console.log("Email sent successfully to:", email);
     return true;
   } catch (error) {
-    console.error('Error sending email:', {
+    console.error("Error sending email:", {
       errorName: error.name,
       errorMessage: error.message,
-      errorCode: error.code
+      errorCode: error.code,
     });
     return false;
   }
-}; 
+};

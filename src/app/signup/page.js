@@ -6,7 +6,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { doc, setDoc } from "firebase/firestore";
-import DotsBackground from '@/components/DotsBackground';
+import DotsBackground from "@/components/DotsBackground";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -31,7 +31,11 @@ export default function SignUp() {
 
     try {
       // Create user in Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
       // Save user info in Firestore
@@ -43,10 +47,10 @@ export default function SignUp() {
       });
 
       // Send verification email
-      await fetch('/api/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+      await fetch("/api/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
       });
 
       // Sign out the user until they verify their email
@@ -128,21 +132,40 @@ export default function SignUp() {
           >
             {loading ? (
               <>
-                <svg className="animate-spin h-5 w-5 mr-2 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-black"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8z"
+                  ></path>
                 </svg>
                 Sending code...
               </>
             ) : (
-              'Sign Up'
+              "Sign Up"
             )}
           </button>
         </form>
         <div className="w-full text-center mt-4 text-gray-400 text-sm">
-          Already have an account? <Link href="/" className="text-yellow-400 hover:underline">Sign in</Link>
+          Already have an account?{" "}
+          <Link href="/" className="text-yellow-400 hover:underline">
+            Sign in
+          </Link>
         </div>
       </div>
     </div>
   );
-} 
+}
