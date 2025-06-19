@@ -18,11 +18,11 @@ export default function OnboardingLink() {
       {/* Centered Card */}
       <div className="flex-1 flex flex-col items-center justify-center">
         <div className="w-full max-w-md bg-zinc-900 rounded-xl shadow-lg p-8 flex flex-col items-center">
-          <h2 className="text-xl font-bold text-white mb-2 text-center">Choose your Whop link</h2>
+          <h2 className="text-xl font-bold text-white mb-2 text-center">Choose your Meta Mansions link</h2>
           <p className="text-zinc-400 text-sm mb-6 text-center">This is the link you send to your customers.</p>
           <div className="w-full mb-6">
             <div className="flex items-center w-full">
-              <span className="px-3 py-2 rounded-l bg-zinc-800 text-zinc-400 border border-zinc-700 border-r-0 text-sm select-none">whop.com/</span>
+              <span className="px-3 py-2 rounded-l bg-zinc-800 text-zinc-400 border border-zinc-700 border-r-0 text-sm select-none">metamansions.com/</span>
               <input
                 type="text"
                 value={link}

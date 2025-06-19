@@ -2,9 +2,11 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function AuthDashboard() {
   const [tab, setTab] = useState('Home');
+  const router = useRouter();
   return (
     <div className="flex h-screen w-full bg-black">
       {/* Sidebar is handled globally */}
@@ -19,17 +21,22 @@ export default function AuthDashboard() {
               <button className="bg-red-600 text-white text-xs px-3 py-1 rounded-full font-semibold">Go live</button>
             </div>
             <div className="flex gap-2">
-              <div className="w-14 h-14 bg-zinc-900 rounded-lg flex items-center justify-center text-xs text-white border border-zinc-700">WhopU Chat</div>
-              <div className="w-14 h-14 bg-zinc-900 rounded-lg flex items-center justify-center text-xs text-white border border-zinc-700">Whop University</div>
+              <div className="w-14 h-14 bg-zinc-900 rounded-lg flex items-center justify-center text-xs text-white border border-zinc-700">Meta Mansions Chat</div>
+              <div className="w-14 h-14 bg-zinc-900 rounded-lg flex items-center justify-center text-xs text-white border border-zinc-700">Meta Mansions University</div>
             </div>
           </div>
           {/* Tabs */}
           <div className="flex border-b border-zinc-800 bg-[#18191c]">
-            {['Home', 'Chat', 'Earn', 'Learn'].map((t) => (
+            {['Home', 'Chat', 'Earn', 'Learn', 'Discover'].map((t) => (
               <button
                 key={t}
-                className={`flex-1 py-3 text-sm font-semibold transition-colors ${tab === t ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-zinc-400'}`}
-                onClick={() => setTab(t)}
+                className={`flex-1 py-3 text-sm font-semibold transition-colors cursor-pointer ${tab === t ? 'text-yellow-400 border-b-2 border-yellow-400' : 'text-zinc-400'}`}
+                onClick={() => {
+                  if (t === 'Discover') router.push('/auth/discover');
+                  else if (t === 'Learn') router.push('/auth/learn');
+                  else if (t === 'Earn') router.push('/auth/earn');
+                  else setTab(t);
+                }}
               >
                 {t}
               </button>
@@ -80,7 +87,7 @@ export default function AuthDashboard() {
         <div className="flex-1 flex items-center justify-center bg-black">
           <div className="flex flex-col items-center justify-center border border-zinc-800 rounded-xl bg-zinc-900 p-10 shadow-lg min-w-[340px] max-w-[400px] mx-auto">
             <div className="mb-4">
-              <img src="/whop-bowl.png" alt="Welcome to Whop" className="w-32 h-32 object-contain mx-auto" />
+              <img src="/whop-bowl.png" alt="Welcome to Meta Mansions" className="w-32 h-32 object-contain mx-auto" />
             </div>
             <div className="text-white text-xl font-bold mb-2 text-center">Welcome to Meta Mansions <span role="img" aria-label="house">🏠</span></div>
             <div className="text-zinc-400 text-sm text-center mb-2">Select a post or app to open it here</div>

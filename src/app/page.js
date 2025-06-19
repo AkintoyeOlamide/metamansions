@@ -23,7 +23,7 @@ export default function Home() {
   const router = useRouter();
 
   const actionCodeSettings = {
-    url: "http://localhost:3000/finishSignIn", // Change to your deployed URL
+    url: "http://localhost:3000/finishSignIn",
     handleCodeInApp: true,
   };
 
@@ -33,13 +33,13 @@ export default function Home() {
     setError("");
 
     try {
-      // Create user with email and password
-      // const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      // const user = userCredential.user;
+      // Create user in Firebase Auth first
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-      // Save user info in Firestore (do NOT save password)
-      await setDoc(doc(db, "users", email), {
-        email,
+      // Now that we have an authenticated user, save user info in Firestore
+      await setDoc(doc(db, "users", email.toLowerCase()), {
+        email: email.toLowerCase(),
         otpVerified: false,
         otp: Math.floor(100000 + Math.random() * 900000).toString(),
         otpCreatedAt: Date.now(),
@@ -58,13 +58,18 @@ export default function Home() {
         return;
       }
 
-      // Redirect to OTP verification page
+      // Sign out the user until they verify their email
+      await auth.signOut();
+
+      // Redirect to verification page
       router.push(`/verify?email=${encodeURIComponent(email)}`);
     } catch (err) {
       if (err.code === "auth/email-already-in-use") {
         setError("Email already in use");
       } else if (err.code === "auth/invalid-email") {
         setError("Invalid email address");
+      } else if (err.code === "auth/weak-password") {
+        setError("Password should be at least 6 characters");
       } else {
         setError(err.message || "Error creating account");
       }
@@ -73,10 +78,6 @@ export default function Home() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    router.push("/");
-  }, [router]);
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-transparent relative overflow-hidden">
@@ -97,7 +98,7 @@ export default function Home() {
           <p className="text-gray-300 mb-8 text-xl md:text-2xl font-bold leading-tight">Empowering Creators To Succeed</p>
         </section>
 
-        {/* Right: Sign Up Card (was Sign In) */}
+        {/* Right: Sign Up Card */}
         <section className="w-full max-w-xs bg-black/40 backdrop-blur-md border border-yellow-600/50 rounded-lg p-6 flex flex-col items-center shadow-lg hover:bg-black/50 transition-all">
           <div className="mb-4 flex items-center">
             <Image src="/gold-logo.PNG" alt="Gold Logo" width={32} height={32} />

@@ -10,6 +10,7 @@ export default function LayoutWrapper({ children }) {
 
   const hideSidebar = (
     pathname.startsWith('/auth') ||
+    pathname.startsWith('/leaderboard') ||
     [
       '/profile',
       '/username',
@@ -17,6 +18,8 @@ export default function LayoutWrapper({ children }) {
       '/profile-picture',
       '/verify',
       '/user-experience',
+      '/signup',
+      '/password-setup',
     ].some((p) => pathname.startsWith(p))
   );
 

@@ -42,10 +42,11 @@ export default function UniversityPage() {
           </div>
           {/* Tabs */}
           <div className="flex items-center gap-6 px-6 py-3 border-b border-zinc-800 bg-zinc-900">
-            <button className="flex flex-col items-center text-xs text-yellow-400 font-semibold border-b-2 border-yellow-400 pb-1">Home</button>
-            <button className="flex flex-col items-center text-xs text-gray-300 hover:text-yellow-400 transition">Chat</button>
-            <button className="flex flex-col items-center text-xs text-gray-300 hover:text-yellow-400 transition">Earn</button>
-            <button className="flex flex-col items-center text-xs text-gray-300 hover:text-yellow-400 transition">Learn</button>
+            <button className="flex flex-col items-center text-xs text-yellow-400 font-semibold border-b-2 border-yellow-400 pb-1 cursor-pointer">Home</button>
+            <button className="flex flex-col items-center text-xs text-gray-300 hover:text-yellow-400 transition cursor-pointer">Chat</button>
+            <button className="flex flex-col items-center text-xs text-gray-300 hover:text-yellow-400 transition cursor-pointer" onClick={() => router.push('/auth/earn')}>Earn</button>
+            <button className="flex flex-col items-center text-xs text-gray-300 hover:text-yellow-400 transition cursor-pointer" onClick={() => router.push('/auth/learn')}>Learn</button>
+            <button className="flex flex-col items-center text-xs text-gray-300 hover:text-yellow-400 transition cursor-pointer" onClick={() => router.push('/auth/discover')}>Discover</button>
           </div>
           {/* Chat Input */}
           <div className="flex-1 flex flex-col overflow-y-auto">

@@ -74,7 +74,7 @@ function VerifyContent() {
   };
 
   const handleSubmit = async (e) => {
-    console.log('Submit button clicked - immediate log'); // Immediate debug log
+    console.log('Submit button clicked - immediate log');
     e.preventDefault();
     setError('');
     setMessage('');
@@ -102,7 +102,7 @@ function VerifyContent() {
       // Sign in with Firebase after successful verification
       try {
         await signInWithEmailAndPassword(auth, email, data.temporaryPassword);
-        setMessage('Verification successful! Redirecting...');
+        setMessage('Verification successful! Redirecting to password setup...');
         setTimeout(() => {
           router.push(data.redirectTo);
         }, 1500);
