@@ -89,38 +89,6 @@ export default function SignUp() {
             className="w-full px-3 py-2 rounded bg-black border border-gray-700 text-gray-200 focus:outline-none focus:border-yellow-400"
             required
           />
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password *"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 rounded bg-black border border-gray-700 text-gray-200 focus:outline-none focus:border-yellow-400 pr-10"
-              required
-            />
-            <span
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-gray-300"
-              onClick={() => setShowPassword((v) => !v)}
-            >
-              {showPassword ? <HiOutlineEyeOff /> : <HiOutlineEye />}
-            </span>
-          </div>
-          <div className="relative">
-            <input
-              type={showConfirm ? "text" : "password"}
-              placeholder="Confirm Password *"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-3 py-2 rounded bg-black border border-gray-700 text-gray-200 focus:outline-none focus:border-yellow-400 pr-10"
-              required
-            />
-            <span
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-gray-300"
-              onClick={() => setShowConfirm((v) => !v)}
-            >
-              {showConfirm ? <HiOutlineEyeOff /> : <HiOutlineEye />}
-            </span>
-          </div>
           <button
             type="submit"
             disabled={loading}

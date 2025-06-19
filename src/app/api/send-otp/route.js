@@ -1,7 +1,20 @@
 import { NextResponse } from 'next/server';
 import { sendVerificationEmail } from '@/lib/emailConfig';
-import { db } from '@/lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { getFirestore } from 'firebase-admin/firestore';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+
+// Initialize Firebase Admin if not already initialized
+if (!getApps().length) {
+  initializeApp({
+    credential: cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+    }),
+  });
+}
+
+const adminDb = getFirestore();
 
 export async function POST(request) {
   try {
@@ -19,8 +32,10 @@ export async function POST(request) {
     console.log('Generated OTP:', otp); // For testing purposes
     console.log('Received signup request for email:', email);
     
-    // Store OTP and verification status in Firestore
-    await setDoc(doc(db, 'users', email.toLowerCase()), {
+    // Store OTP and verification status in Firestore using Admin SDK
+    const userRef = adminDb.collection('users').doc(email.toLowerCase());
+    await userRef.set({
+      email: email.toLowerCase(),
       otp,
       otpVerified: false,
       otpCreatedAt: Date.now(),

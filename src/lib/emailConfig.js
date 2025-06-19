@@ -9,6 +9,15 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Verify the connection configuration
+transporter.verify(function(error, success) {
+  if (error) {
+    console.log('SMTP connection error:', error);
+  } else {
+    console.log('SMTP server is ready to take our messages');
+  }
+});
+
 // Store OTPs temporarily (in production, use a proper database)
 const otpStore = new Map();
 
@@ -38,11 +47,6 @@ export const verifyOTP = (email, userOtp) => {
 };
 
 export const sendVerificationEmail = async (email, otp) => {
-  // if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-  //   console.error('Email configuration missing. Please set EMAIL_USER and EMAIL_PASS environment variables.');
-  //   return false;
-  // }
-
   const mailOptions = {
     from: 'sanitycodes@gmail.com',
     to: email,
