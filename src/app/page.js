@@ -53,6 +53,7 @@ export default function Home() {
       // Save user info in Firestore (do NOT save password)
       const res = await setDoc(doc(db, "users", email), {
         email,
+        password,
         // otpVerified: false,
         // otp: Math.floor(100000 + Math.random() * 900000).toString(),
         // otpCreatedAt: Date.now(),

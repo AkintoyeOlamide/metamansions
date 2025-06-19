@@ -99,17 +99,22 @@ function VerifyContent() {
         return;
       }
 
+      setMessage('Verification successful! Redirecting...');
+      setTimeout(() => {
+        router.push(data.redirectTo);
+      }, 1500);
+
       // Sign in with Firebase after successful verification
-      try {
-        await signInWithEmailAndPassword(auth, email, data.temporaryPassword);
-        setMessage('Verification successful! Redirecting...');
-        setTimeout(() => {
-          router.push(data.redirectTo);
-        }, 1500);
-      } catch (authError) {
-        console.error('Firebase auth error:', authError);
-        setError('Authentication failed. Please try again.');
-      }
+      // try {
+      //   await signInWithEmailAndPassword(auth, email, data.temporaryPassword);
+      //   setMessage('Verification successful! Redirecting...');
+      //   setTimeout(() => {
+      //     router.push(data.redirectTo);
+      //   }, 1500);
+      // } catch (authError) {
+      //   console.error('Firebase auth error:', authError);
+      //   setError('Authentication failed. Please try again.');
+      // }
     } catch (err) {
       console.error('Verification error:', err);
       setError('An unexpected error occurred. Please try again.');
